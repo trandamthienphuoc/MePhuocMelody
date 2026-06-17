@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Trần Đàm Thiên Phước">
+    <meta name="description" content="PhuocMelody - Cửa hàng nhạc cụ cao cấp, sáng lập bởi Trần Đàm Thiên Phước">   
+    <title>PhuocMelody - Premium Music Store</title>
+    <link rel="stylesheet" href="StyleBT4.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="#" class="logo">🎵 PhuocMelody</a>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Tìm nhạc cụ bạn yêu thích..." oninput="filterProducts()">
+        </div>
+        
+        <div class="nav-actions">
+            <button id="adminReportBtn" class="history-btn" onclick="openAdminReportModal()" style="display:none; background: #fef3c7; color: #d97706; border-color: #fcd34d;">
+                📊 Doanh Thu & Đơn
+            </button>
+            <button id="adminUsersBtn" class="history-btn" onclick="openAdminUsersModal()" style="display:none; background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+                👥 Quản Lý KH
+            </button>
+
+            <button class="history-btn" onclick="openOrderHistoryModal()">
+                📋 Lịch Sử Đơn
+            </button>
+            <button class="cart-btn" onclick="openCartModal()">
+                🛒 Giỏ Hàng (<span id="cart-count">0</span>)
+            </button>
+        <div id="authSection">
+            <button class="btn-auth" onclick="toggleModal('loginModal', true)">🔑 Đăng Nhập</button>
+        </div>
+    </div>
+    </header>
+
+    <div class="slideshow-container">
+        <div class="slide fade">
+            <img src="nen4.jpg" alt="Banner 1">
+            <div class="slide-text">Chạm vào cảm hứng, cất lên thanh âm của riêng bạn</div>
+        </div>
+        <div class="slide fade">
+            <img src="nen3.jpg" alt="Banner 2">
+            <div class="slide-text">Giai Điệu Mới - Cảm Hứng Mới</div>
+        </div>
+        <div class="slide fade">
+            <img src="nen6.jpg" alt="Banner 3">
+            <div class="slide-text">Đừng chỉ nghe âm nhạc — hãy tự mình tạo nên nó</div>
+        </div>
+    </div>
+
+    <div class="role-badge container" id="roleBadge">Chế độ khách: Bạn cần đăng nhập để mua sắm</div>
+
+    <main class="container">
+        <div class="filter-admin-bar">
+            <div class="filter-buttons">
+                <button class="btn-filter active" onclick="filterCategory('all', this)">Tất Cả</button>
+                <button class="btn-filter" onclick="filterCategory('guitar', this)">Guitar</button>
+                <button class="btn-filter" onclick="filterCategory('piano', this)">Piano</button>
+                <button class="btn-filter" onclick="filterCategory('drums', this)">Trống</button>
+                <button class="btn-filter" onclick="filterCategory('strings', this)">Nhạc cụ Dây</button>
+                <button class="btn-filter" onclick="filterCategory('wind', this)">Nhạc cụ Hơi</button>
+            </div>
+            <button class="btn-add" id="adminAddBtn" style="display: none;" onclick="openAddModal()">➕ Thêm Nhạc Cụ</button>
+        </div>
+
+        <div class="product-grid" id="productGrid"></div>
+    </main>
+
+    <div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="toggleModal('loginModal', false)">&times;</span>
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+            <h2 id="tabLoginTitle" style="cursor: pointer; color: var(--primary-color);" onclick="switchAuthTab('login')">Đăng Nhập</h2>
+            <h2 id="tabRegisterTitle" style="cursor: pointer; color: #94a3b8;" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</h2>
+        </div>
+
+        <div class="demo-account-hint" id="authHint">
+            💡 Tài khoản mẫu:<br>
+            • Admin: admin@gmail.com / 123456<br>
+            • Khách: khach@gmail.com / 123456
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Email tài khoản:</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu:</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <div id="loginError" style="color: red; font-size: 13px; margin-bottom: 10px; font-weight: 600;"></div>
+            <button type="submit" class="checkout-btn">Xác Nhận Đăng Nhập</button>
+        </form>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+            <div class="form-group">
+                <label>Email đăng ký mới:</label>
+                <input type="email" id="regEmail" placeholder="ví dụ: customer2@gmail.com" required>
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu:</label>
+                <input type="password" id="regPassword" minlength="6" placeholder="Tối thiểu 6 ký tự" required>
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu:</label>
+                <input type="password" id="regPasswordConfirm" required>
+            </div>
+            <div id="registerError" style="color: red; font-size: 13px; margin-bottom: 10px; font-weight: 600;"></div>
+            <button type="submit" class="checkout-btn" style="background: var(--accent-green);">Tạo Tài Khoản Mới</button>
+        </form>
+    </div>
+</div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content max-w-700">
+            <span class="close-btn" onclick="toggleModal('detailModal', false)">&times;</span>
+            <div class="detail-container">
+                <img id="detailImg" src="" alt="">
+                <div class="detail-info">
+                    <h2 id="detailName"></h2>
+                    <p class="detail-cate">Danh mục: <span id="detailCategory"></span></p>
+                    <div class="detail-price" id="detailPrice"></div>
+                    <p id="detailDesc" class="detail-desc"></p>
+                    <button id="detailAddBtn" class="checkout-btn">Thêm Vào Giỏ Hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content max-w-700">
+            <span class="close-btn" onclick="toggleModal('cartModal', false)">&times;</span>
+            <h2>Giỏ Hàng Của Bạn</h2>
+            
+            <div class="cart-layout">
+                <div class="cart-left">
+                    <div id="cart-items-container"></div>
+                    
+                    <div class="price-summary-box">
+                        <div class="summary-row"><span>Tiền hàng:</span> <span id="cart-subtotal">0</span> đ</div>
+                        <div class="summary-row"><span>Phí vận chuyển:</span> <span id="cart-shipping-fee">0</span> đ</div>
+                        <div class="summary-row text-hint" id="shipping-hint"></div>
+                        <hr>
+                        <div class="total-price-box" style="margin-top:5px;">Tổng cộng: <span id="cart-total">0</span> đ</div>
+                    </div>
+                </div>
+                
+                <div class="cart-right" id="shippingSection">
+                    <h3>Thông Tin Vận Chuyển</h3>
+                    <form id="shippingForm" onsubmit="handleCheckout(event)">
+                        <div class="form-group">
+                            <label>Người nhận:</label>
+                            <input type="text" id="shipName" required placeholder="Tên khách hàng...">
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại:</label>
+                            <input type="tel" id="shipPhone" required placeholder="Số điện thoại...">
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ nhận nhạc cụ:</label>
+                            <input type="text" id="shipAddress" required placeholder="Địa chỉ giao hàng...">
+                        </div>
+                        <div class="form-group">
+                            <label>Phương thức giao hàng:</label>
+                            <select id="shipMethod">
+                                <option value="Hỏa tốc">Hỏa tốc nội thành (Trong ngày)</option>
+                                <option value="Tiêu chuẩn">Giao hàng tiêu chuẩn (2-3 ngày)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="checkout-btn" style="background-color: #059669;">XÁC NHẬN ĐƠN HÀNG</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="billModal" class="modal">
+        <div class="modal-content max-w-500 bill-modern-theme">
+            <span class="close-btn" onclick="toggleModal('billModal', false)">&times;</span>
+            
+            <div class="bill-badge-status">✔ Đã thanh toán</div>
+            
+            <div class="bill-header">
+                <h2>HÓA ĐƠN MUA HÀNG</h2>
+                <p class="store-name">PhuocMelody Music Store</p>
+                <div class="bill-code-box">
+                    Mã hóa đơn: <span id="billInvoiceCode"></span>
+                </div>
+            </div>
+            
+            <div class="bill-body">
+                <div class="bill-section-title">Thông tin khách hàng</div>
+                <div class="bill-row"><span>Khách hàng:</span> <strong id="billCustomer"></strong></div>
+                <div class="bill-row"><span>Số điện thoại:</span> <span id="billPhone"></span></div>
+                <div class="bill-row"><span>Địa chỉ giao:</span> <span id="billAddress"></span></div>
+                <div class="bill-row"><span>Hình thức giao:</span> <span id="billMethod"></span></div>
+                
+                <div class="bill-section-title" style="margin-top: 15px;">Chi tiết nhạc cụ</div>
+                <div id="billItems" class="bill-items-list"></div>
+                
+                <div class="bill-row" style="padding: 0 12px; margin-top: 5px;"><span>Phí vận chuyển:</span> <span id="billShippingFee"></span></div>
+                
+                <div class="bill-total-row">
+                    <span>TỔNG TIỀN:</span>
+                    <span id="billTotal"></span>
+                </div>
+                
+                <div class="bill-time-stamp" id="billTime"></div>
+            </div>
+            
+            <div class="bill-footer">
+                <p>💚 Cảm ơn bạn đã đồng hành cùng PhuocMelody! 😘💕</p>
+                <button class="btn-close-bill" onclick="toggleModal('billModal', false)">Hoàn tất & Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content max-w-700">
+            <span class="close-btn" onclick="toggleModal('historyModal', false)">&times;</span>
+            <h2>Nhật Ký Hóa Đơn Đã Thanh Toán</h2>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Dưới đây là danh sách các hóa đơn bạn đã thanh toán thành công trong hệ thống:</p>
+            
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Hóa Đơn</th>
+                            <th>Thời Gian</th>
+                            <th>Khách Hàng</th>
+                            <th>Tổng Tiền</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="productFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleModal('productFormModal', false)">&times;</span>
+            <h2 id="formTitle">Thêm Sản Phẩm Mới</h2>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="formId">
+                <div class="form-group">
+                    <label>Tên nhạc cụ:</label>
+                    <input type="text" id="formName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phân loại:</label>
+                    <select id="formCategory">
+                        <option value="guitar">Guitar</option>
+                        <option value="piano">Piano/Keyboard</option>
+                        <option value="drums">Trống/Percussion</option>
+                        <option value="strings">Nhạc cụ Dây</option>
+                        <option value="wind">Nhạc cụ Hơi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Giá tiền (đ):</label>
+                    <input type="number" id="formPrice" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Số lượng tồn kho:</label>
+                    <input type="number" id="formStock" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Link ảnh (URL):</label>
+                    <input type="text" id="formImg" required>
+                </div>
+                <div class="form-group">
+                    <label>Mô tả chi tiết:</label>
+                    <textarea id="formDesc" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Lưu Sản Phẩm</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section company-info">
+                <h3 class="footer-logo">🎵 PhuocMelody</h3>
+                <p class="company-desc">Hệ thống phân phối nhạc cụ chính hãng cao cấp hàng đầu Việt Nam. Nơi nuôi dưỡng và nâng tầm những giai điệu đam mê của bạn.</p>
+                
+                <div class="social-icons">
+                    <a href="https://www.facebook.com" target="_blank" class="icon-link fb-color" title="Theo dõi trên Facebook">
+                        <i class="fa-brands fa-facebook"></i> Facebook
+                    </a>
+                    <a href="https://www.instagram.com" target="_blank" class="icon-link ins-color" title="Theo dõi trên Instagram">
+                        <i class="fa-brands fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://www.tiktok.com" target="_blank" class="icon-link tt-color" title="Theo dõi trên TikTok">
+                        <i class="fa-brands fa-tiktok"></i> TikTok
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Danh Mục Nhạc Cụ</h3>
+                <ul>
+                    <li><a href="#" onclick="window.scrollTo({top: 400, behavior: 'smooth'})">Guitar Cao Cấp</a></li>
+                    <li><a href="#" onclick="window.scrollTo({top: 400, behavior: 'smooth'})">Piano & Organ Điện</a></li>
+                    <li><a href="#" onclick="window.scrollTo({top: 400, behavior: 'smooth'})">Trống & Percussion</a></li>
+                    <li><a href="#" onclick="window.scrollTo({top: 400, behavior: 'smooth'})">Nhạc Cụ Dây & Hơi</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Chính Sách Khách Hàng</h3>
+                <ul>
+                    <li><a href="#" onclick="alert('Sản phẩm được bảo hành điện tử chính hãng 12 tháng kể từ ngày in Bill.')">Chính Sách Bảo Hành</a></li>
+                    <li><a href="#" onclick="alert('Đổi trả miễn phí trong vòng 7 ngày nếu có lỗi kỹ thuật từ nhà sản xuất.')">Chính Sách Đổi Trả</a></li>
+                    <li><a href="#" onclick="alert('Hệ thống áp dụng chính sách vận chuyển: Phí ship 200k cho đơn dưới 5 triệu, MIỄN PHÍ SHIP toàn quốc cho đơn từ 5 triệu trở lên.')">Vận Chuyển & Giao Nhận</a></li>
+                    <li><a href="#" onclick="alert('Hệ thống bảo mật thông tin khách hàng tuyệt đối sơ sài.')">Bảo Mật Thông Tin</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section contact-info">
+                <h3>Thông Tin Liên Hệ</h3>
+                <p>📍 <b>Địa chỉ:</b> 215 Điện Biên Phủ, Phường 15, Quận Bình Thạnh, TP. Hồ Chí Minh</p>
+                <p>📞 <b>Hotline hỗ trợ:</b> 0389.279.353</p>
+                <p>✉ <b>Email:</b> support@phuocmelody.vn</p>
+                <div class="certified-box">
+                    <span class="badge-bct">✓ Đã Đăng Ký Bộ Công Thương</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 PhuocMelody Store. Tất cả quyền được bảo lưu. Phát triển bởi Trần Phước.</p>
+        </div>
+    </footer>
+
+    <script src="ScriptBT4.js"></script>
+
+    <div id="adminUsersModal" class="modal">
+    <div class="modal-content max-w-700">
+        <span class="close-btn" onclick="toggleModal('adminUsersModal', false)">&times;</span>
+        <h2>👥 Danh Sách Quản Lý Khách Hàng</h2>
+        <p style="font-size:13px; color:#64748b; margin-bottom: 15px;">Quyền Admin: Toàn quyền quản lý hệ thống nhạc cụ.</p>
+        <div class="history-table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Email khách hàng</th>
+                        <th>Vai trò</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="adminReportModal" class="modal">
+    <div class="modal-content max-w-700" style="max-height: 85vh; overflow-y: auto;">
+        <span class="close-btn" onclick="toggleModal('adminReportModal', false)">&times;</span>
+        <h2>📊 Nhật Ký Hệ Thống & Tổng Doanh Thu</h2>
+        
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; color: #166534; font-size: 16px;">💰 TỔNG DOANH THU TRONG NGÀY:</span>
+            <span id="adminTotalRevenue" style="font-size: 24px; font-weight: 800; color: #15803d;">0 đ</span>
+        </div>
+
+        <h3 style="font-size: 15px; margin-bottom: 10px; color: var(--dark-color);">📋 Danh Sách Chi Tiết Đơn Hàng Mua Sắm:</h3>
+        <div class="history-table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng / Đồ Đặt mua</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái Đơn Hàng</th>
+                    </tr>
+                </thead>
+                <tbody id="adminReportTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
